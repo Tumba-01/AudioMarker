@@ -20,6 +20,7 @@ body {
 /* Style the title */
 h1 {
     font-size: 24px;
+    margin-top: 10px;
     margin-bottom: 20px;
 }
 
@@ -43,7 +44,7 @@ button:hover {
 
 /* Style the table */
 table {
-    width: 80%;
+    width: 20%;
     margin-top: 20px;
     border-collapse: collapse;
     background-color: #444;
@@ -53,7 +54,7 @@ table {
 th {
     background-color: #555;
     color: #fff;
-    text-align: left;
+    text-align: center;
     padding: 10px;
     font-weight: bold;
     border-bottom: 1px solid #888;
@@ -66,15 +67,39 @@ tr {
 
 /* Style table data cells */
 td {
-    padding: 10px;
+    padding: 2px;
 }
 
-/* Style checkboxes */
+/* Default styling for checkboxes */
 input[type="checkbox"] {
+    appearance: none; /* Hide the default checkbox */
+    width: 20px; /* Adjust the width of the custom checkbox */
+    height: 20px; /* Adjust the height of the custom checkbox */
+    border: 2px solid black; /* Black border for the checkbox */
+    background-color: white; /* White background */
+    cursor: pointer; /* Change cursor on hover */
+}
+
+/* Styling for checked checkboxes */
+input[type="checkbox"]:checked {
+    background-color: green; /* Green background for checked checkbox */
+    border: 2px solid black; /* Black border for checked checkbox */
+}
+
+/* Styling for the checkmark inside the checkbox */
+input[type="checkbox"]::before {
+    display: block;
     width: 20px;
     height: 20px;
-    margin-right: 5px;
-    vertical-align: middle;
+    text-align: center;
+    line-height: 20px;
+    color: white; /* White checkmark color */
+    font-weight: bold;
+    font-size: 16px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    visibility: hidden; /* Initially hidden */
 }
 
 /* Style odd rows with a different background color for better readability */
@@ -86,3 +111,4 @@ tr:nth-child(odd) {
 tr:hover {
     background-color: #666;
 }
+
