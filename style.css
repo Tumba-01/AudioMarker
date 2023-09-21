@@ -1,7 +1,8 @@
 /* Reset default styles */
 body, h1, button, table {
-    margin: 0;
+    margin: 50;
     padding: 0;
+    zoom: 1.2; /* Adjust the zoom factor as needed */
 }
 
 /* Apply a background color for dark mode */
