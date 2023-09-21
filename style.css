@@ -171,7 +171,13 @@ tr:hover {
 }
 
 .modal {
-    /* Other styles for your modal */
-    z-index: 999;
-    /* Your existing modal styles here */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 1000; /* Ensure it's above the modal background */
+    text-align: center;
 }
