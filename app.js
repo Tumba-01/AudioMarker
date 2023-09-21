@@ -3,16 +3,15 @@ const numbersList = [5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25, 26, 
 window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 
 let isListening = false; // Track the listening state
+let isEnglish = true; // Track the language state
 
 // Create a function to toggle recognition on/off
 function toggleRecognition() {
     if (!recognition) {
         recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
-        recognition.lang = 'en-US'; // Set the language (you can change it)
-
         recognition.onresult = (event) => {
             const result = event.results[0][0].transcript;
-            document.getElementById('output').innerText = 'Result received: ' + result;
+            document.getElementById('output').innerText = result;
             markNumberAsChecked(result);
         };
 
@@ -25,6 +24,7 @@ function toggleRecognition() {
     }
 
     if (!isListening) {
+        recognition.lang = isEnglish ? 'en-US' : 'de-DE'; // Set the language based on the language state
         recognition.start();
         isListening = true;
     } else {
@@ -37,7 +37,27 @@ function toggleRecognition() {
     startButton.innerText = isListening ? 'Stop Recognition' : 'Start Recognition';
 }
 
+// Create a function to toggle between English and German
+function toggleLanguage() {
+    isEnglish = !isEnglish; // Toggle the language state
+
+    // Get the language-toggle button element
+    const languageToggleButton = document.getElementById('language-toggle');
+
+    // Update the button text based on the language state
+    languageToggleButton.innerText = isEnglish ? 'Change the language to German' : 'Sprache wechseln auf Englisch';
+
+    // Set the recognition language if listening is active
+    if (isListening) {
+        recognition.lang = isEnglish ? 'en-US' : 'de-DE'; // Set the language based on the language state
+    }
+}
+
+// Add a click event listener to the "start-recognition" button
 document.getElementById('start-recognition').addEventListener('click', toggleRecognition);
+
+// Add a click event listener to the "language-toggle" button
+document.getElementById('language-toggle').addEventListener('click', toggleLanguage);
 
 function markNumberAsChecked(text) {
     // Use a regular expression to search for numbers in the text
@@ -56,3 +76,15 @@ function markNumberAsChecked(text) {
         }
     }
 }
+
+// Add this event listener for the reset button
+document.getElementById('reset-checkboxes').addEventListener('click', () => {
+    // Loop through the checkboxes and uncheck them
+    for (const number of numbersList) {
+        const checkbox = document.getElementById('check-' + number);
+        if (checkbox && checkbox.checked) {
+            checkbox.checked = false;
+            checkbox.removeAttribute('data-number-text');
+        }
+    }
+});

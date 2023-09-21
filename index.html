@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Voice Recognition</title>
+    <title>AudioMarker</title>
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <h1>Voice Recognition</h1>
-    <button id="start-recognition">Start Recording</button>
-    <button id="stop-recognition" style="display: none;">Stop Recording</button>
+    <h1>AudioMarker</h1>
+<!-- Wrap the buttons in a div for styling -->
+        <div id="button-container">
+            <button id="start-recognition">Start Recording</button>
+            <button id="stop-recognition" style="display: none;">Stop Recording</button>
+            <button id="reset-checkboxes">Reset Checkboxes</button>
+        </div>
+        <button id="language-toggle">Switch Language</button>
+        <div id="console-log">Console Log</div>
+        <div id="output"></div>
     <table id="number-table">
         <!-- Table headers -->
         <tr>
@@ -153,8 +160,6 @@
     </tr>
         <!-- Add rows for other numbers similarly -->
     </table>
-    <div id="output"></div>
-
     <script src="app.js"></script>
 </body>
 </html>

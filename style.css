@@ -6,7 +6,7 @@ body, h1, button, table {
 
 /* Apply a background color for dark mode */
 body {
-    background-color: #111;
+    background-color: #1A211E;
     color: #fff;
     font-family: Arial, sans-serif;
     text-align: center;
@@ -26,43 +26,43 @@ h1 {
 
 /* Style the buttons */
 button {
-    background-color: #007bff;
+    background-color: #0B3225;
     color: #fff;
     padding: 10px 20px;
     border: none;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 100px;
     font-size: 16px;
     margin: 5px;
     transition: background-color 0.3s;
+    box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* Button hover effect */
 button:hover {
-    background-color: #0056b3;
+    background-color: #35D49F;
 }
 
-/* Style the table */
+/* Add this CSS to style the table with rounded corners */
 table {
-    width: 20%;
-    margin-top: 20px;
     border-collapse: collapse;
-    background-color: #444;
+    width: 100%;
+    max-width: 400px; /* Adjust the maximum width as needed */
+    margin: 0 auto; /* Center the table horizontally */
+    border-radius: 10px; /* Adjust the border radius for rounded corners */
+    overflow: hidden; /* Hide any overflowing content */
+    margin-top: 20px;
+    margin-bottom: 20px;
+    box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* Style table headers */
 th {
-    background-color: #555;
+    background-color: #0B3225;
     color: #fff;
     text-align: center;
     padding: 10px;
     font-weight: bold;
-    border-bottom: 1px solid #888;
-}
-
-/* Style table rows */
-tr {
-    border-bottom: 1px solid #888;
 }
 
 /* Style table data cells */
@@ -75,15 +75,13 @@ input[type="checkbox"] {
     appearance: none; /* Hide the default checkbox */
     width: 20px; /* Adjust the width of the custom checkbox */
     height: 20px; /* Adjust the height of the custom checkbox */
-    border: 2px solid black; /* Black border for the checkbox */
     background-color: white; /* White background */
     cursor: pointer; /* Change cursor on hover */
 }
 
 /* Styling for checked checkboxes */
 input[type="checkbox"]:checked {
-    background-color: green; /* Green background for checked checkbox */
-    border: 2px solid black; /* Black border for checked checkbox */
+    background-color: #05EB20; /* Green background for checked checkbox */
 }
 
 /* Styling for the checkmark inside the checkbox */
@@ -93,7 +91,6 @@ input[type="checkbox"]::before {
     height: 20px;
     text-align: center;
     line-height: 20px;
-    color: white; /* White checkmark color */
     font-weight: bold;
     font-size: 16px;
     position: absolute;
@@ -104,11 +101,61 @@ input[type="checkbox"]::before {
 
 /* Style odd rows with a different background color for better readability */
 tr:nth-child(odd) {
-    background-color: #555;
+    background-color: #0B3225;
+}
+
+tr:nth-child(even) {
+    background-color: #466C60;
 }
 
 /* Hover effect on rows */
 tr:hover {
-    background-color: #666;
+    background-color: #35D49F;
+}
+
+/* Add this CSS to style the button container */
+#button-container {
+    display: flex;
+    gap: 10px; /* Adjust the gap as needed */
+    align-items: center; /* Center buttons vertically */
+    padding-bottom: 15px;
+}
+
+#output {
+    background-color: #0B3225;
+    color: #0f0; /* Green text color */
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    padding: 10px;  
+    border-radius: 15px;
+    height: 20px; /* Adjust the height as needed */
+    width: 325px;
+    overflow-y: scroll; /* Add a scrollbar if the content overflows */
+    text-align: center;
+    box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+#console-log {
+    font-size: 15px;
+    background-color: #0B3225;
+    border: 6px solid #0B3225;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    width: 150px;
+    box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+#output::-webkit-scrollbar {
+    width: 10px; /* Adjust the width as needed */
+    margin-right: 100px;
+}
+
+#output::-webkit-scrollbar-thumb {
+    background-color: #0f0; /* Color of the scrollbar thumb (green in this example) */
+    border-radius: 5px;
+}
+
+#output::-webkit-scrollbar-track {
+    background-color: rgba(0, 255, 0, 0.000); /* Color of the scrollbar track (black in this example) */
 }
 
