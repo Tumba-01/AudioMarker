@@ -1,0 +1,88 @@
+/* Reset default styles */
+body, h1, button, table {
+    margin: 0;
+    padding: 0;
+}
+
+/* Apply a background color for dark mode */
+body {
+    background-color: #111;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* height: 100vh; */ /* Remove or change this line */
+}
+
+/* Style the title */
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Style the buttons */
+button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
+    margin: 5px;
+    transition: background-color 0.3s;
+}
+
+/* Button hover effect */
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Style the table */
+table {
+    width: 80%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    background-color: #444;
+}
+
+/* Style table headers */
+th {
+    background-color: #555;
+    color: #fff;
+    text-align: left;
+    padding: 10px;
+    font-weight: bold;
+    border-bottom: 1px solid #888;
+}
+
+/* Style table rows */
+tr {
+    border-bottom: 1px solid #888;
+}
+
+/* Style table data cells */
+td {
+    padding: 10px;
+}
+
+/* Style checkboxes */
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+/* Style odd rows with a different background color for better readability */
+tr:nth-child(odd) {
+    background-color: #555;
+}
+
+/* Hover effect on rows */
+tr:hover {
+    background-color: #666;
+}
