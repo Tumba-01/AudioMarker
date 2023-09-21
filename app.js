@@ -1,5 +1,6 @@
 let recognition = null;
 const numbersList = [5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25, 26, 27, 28, 29, 30, 31, 33, 34, 35, 71, 83, 107, 110, 111, 115, 122, 123, 124, 125, 126];
+window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 
 document.getElementById('start-recognition').addEventListener('click', () => {
     if (!recognition) {
