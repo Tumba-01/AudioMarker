@@ -1,5 +1,5 @@
 let recognition = null;
-const numbersList = [5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25, 26, 27, 28, 29, 30, 31, 33, 34, 35, 71, 83, 107, 110, 111, 115, 122, 123, 124, 125, 126];
+const numbersList = [5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25, 26, 27, 28, 29, 30, 31, 33, 34, 35, 71, 83, 107, 110, 111, 115, 122, 123, 124, 125, 126, 55];
 window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 
 let isListening = false; // Track the listening state
@@ -71,6 +71,14 @@ function markNumberAsChecked(text) {
                 const checkbox = document.getElementById('check-' + number);
                 if (checkbox && !checkbox.checked) {
                     checkbox.checked = true;
+                }
+            }
+            
+            // Check for "55" and also tick the checkbox for "5"
+            if (number === 55) {
+                const checkbox5 = document.getElementById('check-5');
+                if (checkbox5 && !checkbox5.checked) {
+                    checkbox5.checked = true;
                 }
             }
         }
