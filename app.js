@@ -96,3 +96,30 @@ document.getElementById('reset-checkboxes').addEventListener('click', () => {
         }
     }
 });
+
+// Get a reference to the modal element and body
+const workaroundModal = document.getElementById('workaround-modal');
+const body = document.body;
+
+// Function to open the modal
+function openWorkaroundModal() {
+    workaroundModal.showModal();
+
+    // Disable scrolling
+    body.classList.add('modal-open');
+}
+
+// Function to close the modal
+function closeWorkaroundModal() {
+    workaroundModal.close();
+
+    // Enable scrolling
+    body.classList.remove('modal-open');
+}
+
+// Call the openWorkaroundModal function when the page loads
+window.addEventListener('load', openWorkaroundModal);
+
+// Close the modal when the "OK" button is clicked
+document.getElementById('workaround-modal-button').addEventListener('click', closeWorkaroundModal);
+

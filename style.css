@@ -159,3 +159,19 @@ tr:hover {
     background-color: rgba(0, 255, 0, 0.000); /* Color of the scrollbar track (black in this example) */
 }
 
+/* Add this CSS to your stylesheet */
+.modal-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 998; /* Lower than the modal */
+    backdrop-filter: blur(5px); /* Adjust the blur amount as needed */
+}
+
+.modal {
+    /* Other styles for your modal */
+    z-index: 999;
+    /* Your existing modal styles here */
+}

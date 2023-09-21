@@ -6,13 +6,22 @@
 </head>
 <body>
     <h1>AudioMarker</h1>
-<!-- Wrap the buttons in a div for styling -->
+
+    <dialog class="modal" id="workaround-modal">
+        <h2>Important Information | Wichtige Information</h2>
+        <p>In case of the voice recognition not working, you can use a work-around where you say "5 O'Clock" and it should register the "5" or any number before "O'Clock".</p>
+        <p>Falls die Spracherkennung nicht funktioniert, können Sie eine Abhilfe schaffen, indem Sie "5 Uhr" sagen, und das Gerät sollte die "5" oder eine beliebige Zahl vor "Uhr" registrieren.</p>
+        <div class="button-div">
+            <button class="button close-button" id="workaround-modal-button">OK</button>
+        </div>
+    </dialog>
+
         <div id="button-container">
             <button id="start-recognition">Start Recording</button>
             <button id="stop-recognition" style="display: none;">Stop Recording</button>
             <button id="reset-checkboxes">Reset Checkboxes</button>
         </div>
-        <button id="language-toggle">Switch Language</button>
+        <button id="language-toggle">Change the language to German</button>
         <div id="console-log">Console Log</div>
         <div id="output"></div>
     <table id="number-table">
