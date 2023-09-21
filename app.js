@@ -123,28 +123,18 @@ window.addEventListener('load', openWorkaroundModal);
 // Close the modal when the "OK" button is clicked
 document.getElementById('workaround-modal-button').addEventListener('click', closeWorkaroundModal);
 
-if ('wakeLock' in navigator) {
-    // The Wake Lock API is supported.
-  } else {
-    // Fallback for browsers that do not support Wake Lock.
+function keepScreenAwake() {
+    const scrollSpeed = 1; // Number of pixels to scroll per iteration.
+    
+    function scrollPage() {
+      window.scrollBy(0, scrollSpeed); // Scroll by 'scrollSpeed' pixels vertically.
+      setTimeout(scrollPage, 100); // Repeat every 100 milliseconds.
+    }
+  
+    // Start scrolling the page.
+    scrollPage();
   }
   
-  let wakeLock = null;
-
-// Request a wake lock when your application starts.
-async function requestWakeLock() {
-  try {
-    wakeLock = await navigator.wakeLock.request('screen');
-  } catch (error) {
-    // Handle any errors here.
-    console.error('Failed to request wake lock:', error);
-  }
-}
-
-// Release the wake lock when your application no longer needs it.
-function releaseWakeLock() {
-  if (wakeLock) {
-    wakeLock.release();
-    wakeLock = null;
-  }
-}
+  // Call the function to start screen awake behavior.
+  keepScreenAwake();
+  
