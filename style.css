@@ -171,21 +171,18 @@ tr:hover {
 }
 
 /* CSS for the modal */
-.modal {
+/* Default styling for larger screens */
+.dialog {
     position: fixed;
     top: 50%;
     left: 50%;
-    background-color: white;
-    padding: 20px;
     transform: translate(-50%, -50%);
-    border-radius: 10px;
-    z-index: 1000; /* Ensure it's above the modal background */
-    text-align: center;
-}
-
-/* CSS for the modal on mobile */
-@media (max-width: 767px) { /* Adjust the breakpoint as needed */
-    .modal {
-        transform: translate(-50%, -250%);
+  }
+  
+  /* Media query for smaller screens, e.g., phones */
+  @media (max-width: 256px) {
+    .dialog {
+      transform: translate(-50%, -250%);
     }
-}
+  }
+  
