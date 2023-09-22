@@ -122,19 +122,4 @@ window.addEventListener('load', openWorkaroundModal);
 
 // Close the modal when the "OK" button is clicked
 document.getElementById('workaround-modal-button').addEventListener('click', closeWorkaroundModal);
-
-function keepScreenAwake() {
-    const scrollSpeed = 1; // Number of pixels to scroll per iteration.
-    
-    function scrollPage() {
-      window.scrollBy(0, scrollSpeed); // Scroll by 'scrollSpeed' pixels vertically.
-      setTimeout(scrollPage, 100); // Repeat every 100 milliseconds.
-    }
-  
-    // Start scrolling the page.
-    scrollPage();
-  }
-  
-  // Call the function to start screen awake behavior.
-  keepScreenAwake();
   
