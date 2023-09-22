@@ -54,7 +54,13 @@ function toggleLanguage() {
 }
 
 // Add a click event listener to the "start-recognition" button
-document.getElementById('start-recognition').addEventListener('click', toggleRecognition);
+document.getElementById('start-recognition').addEventListener('click', () => {
+    // Acquire the wake lock when starting recording
+    toggleWakeLock();
+    // Start recording logic
+    toggleRecognition();
+});
+
 
 // Add a click event listener to the "language-toggle" button
 document.getElementById('language-toggle').addEventListener('click', toggleLanguage);
@@ -122,3 +128,39 @@ window.addEventListener('load', openWorkaroundModal);
 
 // Close the modal when the "OK" button is clicked
 document.getElementById('workaround-modal-button').addEventListener('click', closeWorkaroundModal);
+
+
+
+let wakeLock = null;
+let isWakeLockEnabled = false;
+
+if ('wakeLock' in navigator) {
+    // Wake Lock is supported
+    document.getElementById("wakeLockAPIAvailable").innerText = 'Wake Lock is supported';
+} else {
+    document.getElementById("wakeLockAPIAvailable").innerText = 'Wake Lock is not supported';
+    disableButtons(true, true); // Disable buttons if wake lock is not supported
+}
+
+async function toggleWakeLock() {
+    if (isWakeLockEnabled) {
+        // Release the wake lock
+        if (wakeLock) {
+            wakeLock.release().then(() => {
+                wakeLock = null; // Set wakeLock to null when released
+            });
+        }
+        isWakeLockEnabled = false;
+    } else {
+        // Acquire the wake lock
+        if (!wakeLock) {
+            wakeLock = await navigator.wakeLock.request("screen");
+            console.log("Wake Lock is acquired");
+
+            wakeLock.addEventListener('release', () => {
+                console.log('Wake Lock is released');
+            });
+        }
+        isWakeLockEnabled = true;
+    }
+}
