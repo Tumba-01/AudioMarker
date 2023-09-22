@@ -187,3 +187,6 @@ tr:hover {
     }
   }
   
+  .hidden {
+    display: none;
+}

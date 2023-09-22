@@ -6,7 +6,6 @@
 </head>
 <body>
     <h1>AudioMarker</h1>
-    <div id="wakeLockAPIAvailable"></div>
     <dialog class="modal" id="workaround-modal">
         <h2>Important Information | Wichtige Information</h2>
         <p>In case of the voice recognition not working, you can use a work-around where you say "5 O'Clock" and it should register the "5" or any number before "O'Clock".</p>
@@ -22,8 +21,14 @@
             <button id="reset-checkboxes">Reset Checkboxes</button>
         </div>
         <button id="language-toggle">Change the language to German</button>
-        <div id="console-log">Console Log</div>
-        <div id="output"></div>
+        
+        
+        <div id="console-log" class="hidden">Console Log</div>
+        <div id="output" class="hidden">
+            <div id="wakeLockAPIAvailable"></div>
+        </div>
+
+
     <table id="number-table">
         <!-- Table headers -->
         <tr>

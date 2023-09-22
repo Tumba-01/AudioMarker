@@ -164,3 +164,14 @@ async function toggleWakeLock() {
         isWakeLockEnabled = true;
     }
 }
+
+document.querySelector('h1').addEventListener('click', () => {
+    // Toggle the visibility of the elements
+    const consoleLog = document.getElementById('console-log');
+    const output = document.getElementById('output');
+    
+    if (consoleLog && output) {
+        consoleLog.classList.toggle('hidden');
+        output.classList.toggle('hidden');
+    }
+});
