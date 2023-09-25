@@ -1,177 +1,34 @@
-let recognition = null;
-const numbersList = [5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25, 26, 27, 28, 29, 30, 31, 33, 34, 35, 71, 83, 107, 110, 111, 115, 122, 123, 124, 125, 126, 55];
-window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+// app.js
 
-let isListening = false; // Track the listening state
-let isEnglish = true; // Track the language state
-
-// Create a function to toggle recognition on/off
-function toggleRecognition() {
-    if (!recognition) {
-        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
-        recognition.onresult = (event) => {
-            const result = event.results[0][0].transcript;
-            document.getElementById('output').innerText = result;
-            markNumberAsChecked(result);
-        };
-
-        recognition.onend = () => {
-            if (isListening) {
-                // If still in listening state, restart recognition
-                recognition.start();
-            }
-        };
-    }
-
-    if (!isListening) {
-        recognition.lang = isEnglish ? 'en-US' : 'de-DE'; // Set the language based on the language state
-        recognition.start();
-        isListening = true;
+function login() {
+    // Get the entered username and password
+    const username = document.querySelector('input[type="text"]').value;
+    const password = document.querySelector('input[type="password"]').value;
+  
+    // Replace these with your actual username and password
+    const expectedUsername = "admin";
+    const expectedPassword = "admin";
+  
+    if (username === expectedUsername && password === expectedPassword) {
+      // Hide the login form and show the content
+      document.getElementById('loginDialog').style.display = 'none';
+      document.getElementById('content').style.display = 'block';
+      document.getElementById('header-box').style.display = 'block';
     } else {
-        recognition.stop();
-        isListening = false;
+      alert("Invalid username or password. Please try again.");
     }
-
-    // Toggle the button text
-    const startButton = document.getElementById('start-recognition');
-    startButton.innerText = isListening ? 'Stop Recognition' : 'Start Recognition';
-}
-
-// Create a function to toggle between English and German
-function toggleLanguage() {
-    isEnglish = !isEnglish; // Toggle the language state
-
-    // Get the language-toggle button element
-    const languageToggleButton = document.getElementById('language-toggle');
-
-    // Update the button text based on the language state
-    languageToggleButton.innerText = isEnglish ? 'Change the language to German' : 'Sprache wechseln auf Englisch';
-
-    // Set the recognition language if listening is active
-    if (isListening) {
-        recognition.lang = isEnglish ? 'en-US' : 'de-DE'; // Set the language based on the language state
-    }
-}
-
-// Add a click event listener to the "start-recognition" button
-document.getElementById('start-recognition').addEventListener('click', () => {
-    // Acquire the wake lock when starting recording
-    toggleWakeLock();
-    // Start recording logic
-    toggleRecognition();
-});
+  }
 
 
-// Add a click event listener to the "language-toggle" button
-document.getElementById('language-toggle').addEventListener('click', toggleLanguage);
-
-function markNumberAsChecked(text) {
-    // Use a regular expression to search for numbers in the text
-    const numbers = text.match(/\d+/g);
-
-    // Iterate through the extracted numbers and check if they match any numbers from the list
-    if (numbers) {
-        for (const numberStr of numbers) {
-            const number = parseInt(numberStr);
-            if (!isNaN(number) && numbersList.includes(number)) {
-                const checkbox = document.getElementById('check-' + number);
-                if (checkbox && !checkbox.checked) {
-                    checkbox.checked = true;
-                }
-            }
-            
-            // Check for "55" and also tick the checkbox for "5"
-            if (number === 55) {
-                const checkbox5 = document.getElementById('check-5');
-                if (checkbox5 && !checkbox5.checked) {
-                    checkbox5.checked = true;
-                }
-            }
-        }
-    }
-}
-
-// Add this event listener for the reset button
-document.getElementById('reset-checkboxes').addEventListener('click', () => {
-    // Loop through the checkboxes and uncheck them
-    for (const number of numbersList) {
-        const checkbox = document.getElementById('check-' + number);
-        if (checkbox && checkbox.checked) {
-            checkbox.checked = false;
-            checkbox.removeAttribute('data-number-text');
-        }
-    }
-});
-
-// Get a reference to the modal element and body
-const workaroundModal = document.getElementById('workaround-modal');
-const body = document.body;
-
-// Function to open the modal
-function openWorkaroundModal() {
-    workaroundModal.showModal();
-
-    // Disable scrolling
-    body.classList.add('modal-open');
-}
-
-// Function to close the modal
-function closeWorkaroundModal() {
-    workaroundModal.close();
-
-    // Enable scrolling
-    body.classList.remove('modal-open');
-}
-
-// Call the openWorkaroundModal function when the page loads
-window.addEventListener('load', openWorkaroundModal);
-
-// Close the modal when the "OK" button is clicked
-document.getElementById('workaround-modal-button').addEventListener('click', closeWorkaroundModal);
-
-
-
-let wakeLock = null;
-let isWakeLockEnabled = false;
-
-if ('wakeLock' in navigator) {
-    // Wake Lock is supported
-    document.getElementById("wakeLockAPIAvailable").innerText = 'Wake Lock is supported';
-} else {
-    document.getElementById("wakeLockAPIAvailable").innerText = 'Wake Lock is not supported';
-    disableButtons(true, true); // Disable buttons if wake lock is not supported
-}
-
-async function toggleWakeLock() {
-    if (isWakeLockEnabled) {
-        // Release the wake lock
-        if (wakeLock) {
-            wakeLock.release().then(() => {
-                wakeLock = null; // Set wakeLock to null when released
-            });
-        }
-        isWakeLockEnabled = false;
-    } else {
-        // Acquire the wake lock
-        if (!wakeLock) {
-            wakeLock = await navigator.wakeLock.request("screen");
-            console.log("Wake Lock is acquired");
-
-            wakeLock.addEventListener('release', () => {
-                console.log('Wake Lock is released');
-            });
-        }
-        isWakeLockEnabled = true;
-    }
-}
-
-document.querySelector('h1').addEventListener('click', () => {
-    // Toggle the visibility of the elements
-    const consoleLog = document.getElementById('console-log');
-    const output = document.getElementById('output');
+  function downloadFile() {
+    // Create an anchor element
+    const a = document.createElement('a');
     
-    if (consoleLog && output) {
-        consoleLog.classList.toggle('hidden');
-        output.classList.toggle('hidden');
-    }
-});
+    // Set the href to the download link
+    a.href = 'https://docs.google.com/spreadsheets/d/1ezwXXfRFe-C2YkOG3llnFu7O3hPI19ZPjSfomePEJfY/edit?usp=sharing';
+    
+    a.setAttribute('target', '_blank');
+    
+    a.click();
+  }
+  
