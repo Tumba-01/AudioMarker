@@ -1,47 +1,179 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>StundenBuch 1.0</title>
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"><link rel="stylesheet" href="./style.css">
-
+    <title>AudioMarker</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-<!-- partial:index.partial.html -->
-<div class="box-form" id="loginDialog">
-	<div class="left">
-		<div class="overlay">
-		<h1>Herzlich willkommen</h1>
-		<p class="welcome-text1">Willkommen auf Sergejs persönlicher Webseite zur Arbeitszeiterfassung!</p>
-		<p class="welcome-text2">Benutzen Sie unbedingt den Benutzernamen und das Passwort, das er Ihnen gegeben hat!</p>
-		</div>
-	</div>
-	
-	
-		<div class="right">
-		<h5>Login</h5>
-		<p>Passwort vergessen? <a href="mailto:mail@sergejkulpinac.dev">E-Mail senden</a> es dauert weniger als eine Minute</p>
-		<div class="inputs">
-			<input type="text" placeholder="user name">
-			<br>
-			<input type="password" placeholder="password">
-		</div>
-			
-			<br><br>
-			<br>
-			<button class="login-btn" onclick="login()">Login</button>
-	</div>
-</div>
-		<div class="header" id="header-box">
-			<h1>StundenBuch v1.0</h1>
-		</div>
-			<div class="container" id="content">
-				<h1>Sergejs Arbeitsstunden</h1>
-				<p>Meine derzeitigen und voraussichtlichen Arbeitsstunden</p>
-				<iframe class="googlesheet" width="100%" height="385px" scrolling="no" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vS7chDkaQwnjEg_PTo3uQAPY0xaQF5DWu5BorwKGpXBpkUz6rSirnUD6g0BWZYTWWJtSy-Jfc9bSk5V/pubhtml?widget=true&amp;headers=false"></iframe>
-				<button onclick="downloadFile()" class="download-btn" ><i class="fa fa-download"></i> Download</button>
-			</div>
-<script src="app.js"></script>
+    <h1>AudioMarker</h1>
+    <dialog class="modal" id="workaround-modal">
+        <h2>Important Information | Wichtige Information</h2>
+        <p>In case of the voice recognition not working, you can use a work-around where you say "5 O'Clock" and it should register the "5" or any number before "O'Clock".</p>
+        <p>Falls die Spracherkennung nicht funktioniert, können Sie eine Abhilfe schaffen, indem Sie "5 Uhr" sagen, und das Gerät sollte die "5" oder eine beliebige Zahl vor "Uhr" registrieren.</p>
+        <div class="button-div">
+            <button class="button close-button" id="workaround-modal-button">OK</button>
+        </div>
+    </dialog>
+
+        <div id="button-container">
+            <button id="start-recognition">Start Recording</button>
+            <button id="stop-recognition" style="display: none;">Stop Recording</button>
+            <button id="reset-checkboxes">Reset Checkboxes</button>
+        </div>
+        <button id="language-toggle">Change the language to German</button>
+        
+        
+        <div id="console-log" class="hidden">Console Log</div>
+        <div id="output" class="hidden">
+            <div id="wakeLockAPIAvailable"></div>
+        </div>
+
+
+    <table id="number-table">
+        <!-- Table headers -->
+        <tr>
+            <th>Number</th>
+            <th>Check</th>
+        </tr>
+        <!-- Table rows for numbers -->
+    <tr data-number="5">
+        <td>5</td>
+        <td><input type="checkbox" id="check-5" disabled></td>
+    </tr>
+    <tr data-number="10">
+        <td>10</td>
+        <td><input type="checkbox" id="check-10" disabled></td>
+    </tr>
+    <tr data-number="11">
+        <td>11</td>
+        <td><input type="checkbox" id="check-11" disabled></td>
+    </tr>
+    <tr data-number="12">
+        <td>12</td>
+        <td><input type="checkbox" id="check-12" disabled></td>
+    </tr>
+    <tr data-number="13">
+        <td>13</td>
+        <td><input type="checkbox" id="check-13" disabled></td>
+    </tr>
+    <tr data-number="14">
+        <td>14</td>
+        <td><input type="checkbox" id="check-14" disabled></td>
+    </tr>
+    <tr data-number="15">
+        <td>15</td>
+        <td><input type="checkbox" id="check-15" disabled></td>
+    </tr>
+    <tr data-number="16">
+        <td>16</td>
+        <td><input type="checkbox" id="check-16" disabled></td>
+    </tr>
+    <tr data-number="17">
+        <td>17</td>
+        <td><input type="checkbox" id="check-17" disabled></td>
+    </tr>
+    <tr data-number="18">
+        <td>18</td>
+        <td><input type="checkbox" id="check-18" disabled></td>
+    </tr>
+    <tr data-number="19">
+        <td>19</td>
+        <td><input type="checkbox" id="check-19" disabled></td>
+    </tr>
+    <tr data-number="20">
+        <td>20</td>
+        <td><input type="checkbox" id="check-20" disabled></td>
+    </tr>
+    <tr data-number="21">
+        <td>21</td>
+        <td><input type="checkbox" id="check-21" disabled></td>
+    </tr>
+    <tr data-number="25">
+        <td>25</td>
+        <td><input type="checkbox" id="check-25" disabled></td>
+    </tr>
+    <tr data-number="26">
+        <td>26</td>
+        <td><input type="checkbox" id="check-26" disabled></td>
+    </tr>
+    <tr data-number="27">
+        <td>27</td>
+        <td><input type="checkbox" id="check-27" disabled></td>
+    </tr>
+    <tr data-number="28">
+        <td>28</td>
+        <td><input type="checkbox" id="check-28" disabled></td>
+    </tr>
+    <tr data-number="29">
+        <td>29</td>
+        <td><input type="checkbox" id="check-29" disabled></td>
+    </tr>
+    <tr data-number="30">
+        <td>30</td>
+        <td><input type="checkbox" id="check-30" disabled></td>
+    </tr>
+    <tr data-number="31">
+        <td>31</td>
+        <td><input type="checkbox" id="check-31" disabled></td>
+    </tr>
+    <tr data-number="33">
+        <td>33</td>
+        <td><input type="checkbox" id="check-33" disabled></td>
+    </tr>
+    <tr data-number="34">
+        <td>34</td>
+        <td><input type="checkbox" id="check-34" disabled></td>
+    </tr>
+    <tr data-number="35">
+        <td>35</td>
+        <td><input type="checkbox" id="check-35" disabled></td>
+    </tr>
+    <tr data-number="71">
+        <td>71</td>
+        <td><input type="checkbox" id="check-71" disabled></td>
+    </tr>
+    <tr data-number="83">
+        <td>83</td>
+        <td><input type="checkbox" id="check-83" disabled></td>
+    </tr>
+    <tr data-number="107">
+        <td>107</td>
+        <td><input type="checkbox" id="check-107" disabled></td>
+    </tr>
+    <tr data-number="110">
+        <td>110</td>
+        <td><input type="checkbox" id="check-110" disabled></td>
+    </tr>
+    <tr data-number="111">
+        <td>111</td>
+        <td><input type="checkbox" id="check-111" disabled></td>
+    </tr>
+    <tr data-number="115">
+        <td>115</td>
+        <td><input type="checkbox" id="check-115" disabled></td>
+    </tr>
+    <tr data-number="122">
+        <td>122</td>
+        <td><input type="checkbox" id="check-122" disabled></td>
+    </tr>
+    <tr data-number="123">
+        <td>123</td>
+        <td><input type="checkbox" id="check-123" disabled></td>
+    </tr>
+    <tr data-number="124">
+        <td>124</td>
+        <td><input type="checkbox" id="check-124" disabled></td>
+    </tr>
+    <tr data-number="125">
+        <td>125</td>
+        <td><input type="checkbox" id="check-125" disabled></td>
+    </tr>
+    <tr data-number="126">
+        <td>126</td>
+        <td><input type="checkbox" id="check-126" disabled></td>
+    </tr>
+        <!-- Add rows for other numbers similarly -->
+    </table>
+    <script src="app.js"></script>
 </body>
 </html>
