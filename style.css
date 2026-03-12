@@ -1,13 +1,12 @@
 /* Reset default styles */
 body, h1, button, table {
-    margin: 50;
+    margin: 0;
     padding: 0;
-    zoom: 1.4; /* Adjust the zoom factor as needed */
+    zoom: 1.4;
 }
 
-/* Apply a background color for dark mode */
 body {
-    background-color: #1A211E;
+    background: radial-gradient(ellipse at top, #0d2e1f, #0a1a12 70%);
     color: #fff;
     font-family: Arial, sans-serif;
     text-align: center;
@@ -15,77 +14,153 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    /* height: 100vh; */ /* Remove or change this line */
+    min-height: 100vh;
 }
 
-/* Style the title */
 h1 {
     font-size: 24px;
     margin-top: 10px;
     margin-bottom: 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #a8f0d0;
+    text-shadow: 0 0 20px rgba(53, 212, 159, 0.4);
 }
 
-/* Style the buttons */
 button {
-    background-color: #0B3225;
+    background: rgba(11, 50, 37, 0.4);
     color: #fff;
     padding: 10px 20px;
-    border: none;
+    border: 1px solid rgba(53, 212, 159, 0.25);
     cursor: pointer;
     border-radius: 100px;
     font-size: 16px;
     margin: 5px;
-    transition: background-color 0.3s;
-    box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.3);
+    transition: background 0.3s, box-shadow 0.3s;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* Button hover effect */
 button:hover {
-    background-color: #35D49F;
+    background: rgba(53, 212, 159, 0.3);
+    box-shadow: 0 4px 20px rgba(53, 212, 159, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-/* Add this CSS to style the table with rounded corners */
+#button-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding-bottom: 15px;
+}
+
+/* Progress bar */
+#progress-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin: 10px 0;
+    width: 100%;
+    max-width: 400px;
+}
+
+#progress-label {
+    font-size: 13px;
+    color: #a8f0d0;
+    letter-spacing: 1px;
+}
+
+#progress-bar-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 100px;
+    overflow: hidden;
+    border: 1px solid rgba(53, 212, 159, 0.2);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #35D49F, #05EB20);
+    border-radius: 100px;
+    transition: width 0.4s ease, background 0.4s ease;
+    box-shadow: 0 0 8px rgba(53, 212, 159, 0.5);
+}
+
+/* Table */
 table {
     border-collapse: collapse;
     width: 100%;
-    max-width: 400px; /* Adjust the maximum width as needed */
-    margin: 0 auto; /* Center the table horizontally */
-    border-radius: 10px; /* Adjust the border radius for rounded corners */
-    overflow: hidden; /* Hide any overflowing content */
+    max-width: 400px;
+    margin: 0 auto;
+    border-radius: 16px;
+    overflow: hidden;
     margin-top: 20px;
     margin-bottom: 20px;
-    box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(53, 212, 159, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
-/* Style table headers */
 th {
-    background-color: #0B3225;
-    color: #fff;
+    background: rgba(11, 50, 37, 0.7);
+    color: #a8f0d0;
     text-align: center;
     padding: 10px;
     font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(53, 212, 159, 0.2);
 }
 
-/* Style table data cells */
 td {
     padding: 2px;
 }
 
-/* Default styling for checkboxes */
+tr:nth-child(odd) {
+    background: rgba(11, 50, 37, 0.35);
+}
+
+tr:nth-child(even) {
+    background: rgba(70, 108, 96, 0.25);
+}
+
+tr:hover {
+    background: rgba(53, 212, 159, 0.15);
+}
+
+tr:has(input[type="checkbox"]:checked) {
+    background: rgba(5, 235, 32, 0.1);
+}
+
+/* Checkboxes */
 input[type="checkbox"] {
-    appearance: none; /* Hide the default checkbox */
-    width: 20px; /* Adjust the width of the custom checkbox */
-    height: 20px; /* Adjust the height of the custom checkbox */
-    background-color: white; /* White background */
-    cursor: pointer; /* Change cursor on hover */
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
 }
 
-/* Styling for checked checkboxes */
 input[type="checkbox"]:checked {
-    background-color: #05EB20; /* Green background for checked checkbox */
+    background: rgba(5, 235, 32, 0.7);
+    border-color: #05EB20;
+    box-shadow: 0 0 8px rgba(5, 235, 32, 0.5);
 }
 
-/* Styling for the checkmark inside the checkbox */
 input[type="checkbox"]::before {
     display: block;
     width: 20px;
@@ -97,96 +172,44 @@ input[type="checkbox"]::before {
     position: absolute;
     top: 0;
     left: 0;
-    visibility: hidden; /* Initially hidden */
+    visibility: hidden;
 }
 
-/* Style odd rows with a different background color for better readability */
-tr:nth-child(odd) {
-    background-color: #0B3225;
-}
-
-tr:nth-child(even) {
-    background-color: #466C60;
-}
-
-/* Hover effect on rows */
-tr:hover {
-    background-color: #35D49F;
-}
-
-/* Add this CSS to style the button container */
-#button-container {
-    display: flex;
-    gap: 10px; /* Adjust the gap as needed */
-    align-items: center; /* Center buttons vertically */
-    padding-bottom: 15px;
-}
-
+/* Output / debug console */
 #output {
-    background-color: #0B3225;
-    color: #0f0; /* Green text color */
+    background: rgba(11, 50, 37, 0.4);
+    color: #0f0;
     font-family: 'Courier New', monospace;
     font-size: 14px;
-    padding: 10px;  
+    padding: 10px;
     border-radius: 15px;
-    height: 20px; /* Adjust the height as needed */
+    height: 20px;
     width: 325px;
-    overflow-y: scroll; /* Add a scrollbar if the content overflows */
+    overflow-y: scroll;
     text-align: center;
-    box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(53, 212, 159, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 #console-log {
     font-size: 15px;
-    background-color: #0B3225;
-    border: 6px solid #0B3225;
+    background: rgba(11, 50, 37, 0.5);
+    border: 1px solid rgba(53, 212, 159, 0.2);
+    border-bottom: none;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     width: 150px;
-    box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-#output::-webkit-scrollbar {
-    width: 10px; /* Adjust the width as needed */
-    margin-right: 100px;
-}
+#output::-webkit-scrollbar { width: 10px; }
+#output::-webkit-scrollbar-thumb { background-color: #0f0; border-radius: 5px; }
+#output::-webkit-scrollbar-track { background-color: rgba(0, 255, 0, 0); }
 
-#output::-webkit-scrollbar-thumb {
-    background-color: #0f0; /* Color of the scrollbar thumb (green in this example) */
-    border-radius: 5px;
-}
-
-#output::-webkit-scrollbar-track {
-    background-color: rgba(0, 255, 0, 0.000); /* Color of the scrollbar track (black in this example) */
-}
-
-/* Add this CSS to your stylesheet */
-.modal-background {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 998; /* Lower than the modal */
-    backdrop-filter: blur(5px); /* Adjust the blur amount as needed */
-}
-
-/* CSS for the modal */
-/* Default styling for larger screens */
-.dialog {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-  
-  /* Media query for smaller screens, e.g., phones */
-  @media (max-width: 256px) {
-    .dialog {
-      transform: translate(-50%, -250%);
-    }
-  }
-  
-  .hidden {
+.hidden {
     display: none;
 }

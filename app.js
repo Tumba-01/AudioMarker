@@ -1,30 +1,120 @@
 let recognition = null;
-const numbersList = [5, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25, 26, 27, 28, 29, 30, 31, 33, 34, 35, 71, 83, 107, 110, 111, 115, 122, 123, 124, 125, 126, 55];
+const numbersList = [2, 12, 59, 61, 62, 64, 65, 68, 70, 72, 86, 87, 95, 96, 97, 98, 99, 105, 106, 109, 110, 173, 186, 187];
 window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 
-let isListening = false; // Track the listening state
-let isEnglish = true; // Track the language state
+let isListening = false;
+let isEnglish = true;
 
-// Create a function to toggle recognition on/off
+// --- Word-to-number mapping ---
+const wordToNumber = {
+    'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
+    'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
+    'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14,
+    'fifteen': 15, 'sixteen': 16, 'seventeen': 17, 'eighteen': 18,
+    'nineteen': 19, 'twenty': 20, 'thirty': 30, 'forty': 40,
+    'fifty': 50, 'sixty': 60, 'seventy': 70, 'eighty': 80,
+    'ninety': 90, 'hundred': 100,
+    'ein': 1, 'eins': 1, 'zwei': 2, 'drei': 3, 'vier': 4, 'fünf': 5,
+    'sechs': 6, 'sieben': 7, 'acht': 8, 'neun': 9, 'zehn': 10,
+    'elf': 11, 'zwölf': 12, 'dreizehn': 13, 'vierzehn': 14,
+    'fünfzehn': 15, 'sechzehn': 16, 'siebzehn': 17, 'achtzehn': 18,
+    'neunzehn': 19, 'zwanzig': 20, 'dreißig': 30, 'vierzig': 40,
+    'fünfzig': 50, 'sechzig': 60, 'siebzig': 70, 'achtzig': 80,
+    'neunzig': 90, 'hundert': 100
+};
+
+function normalizeTranscript(text) {
+    return text.toLowerCase().split(/\s+/).map(word => {
+        return wordToNumber[word] !== undefined ? wordToNumber[word] : word;
+    }).join(' ');
+}
+
+// --- Progress bar ---
+function updateProgress() {
+    const total = numbersList.length;
+    const checked = numbersList.filter(n => {
+        const cb = document.getElementById('check-' + n);
+        return cb && cb.checked;
+    }).length;
+
+    document.getElementById('progress-label').innerText = `${checked} / ${total} checked`;
+    document.getElementById('progress-bar-fill').style.width = `${(checked / total) * 100}%`;
+
+    // Turn bar gold when all done
+    document.getElementById('progress-bar-fill').style.background =
+        checked === total
+            ? 'linear-gradient(90deg, #f5c400, #ffe066)'
+            : 'linear-gradient(90deg, #35D49F, #05EB20)';
+}
+
+// --- Haptic feedback ---
+function vibrate() {
+    if ('vibrate' in navigator) {
+        navigator.vibrate(50);
+    }
+}
+
+// --- Audio feedback ---
+function playSuccessSound() {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+    oscillator.frequency.setValueAtTime(1100, audioCtx.currentTime + 0.1);
+
+    gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+
+    oscillator.start(audioCtx.currentTime);
+    oscillator.stop(audioCtx.currentTime + 0.4);
+}
+
+function playUnrecognizedSound() {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    oscillator.type = 'sawtooth';
+    oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+    oscillator.frequency.setValueAtTime(200, audioCtx.currentTime + 0.15);
+
+    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+
+    oscillator.start(audioCtx.currentTime);
+    oscillator.stop(audioCtx.currentTime + 0.4);
+}
+
+// --- Recognition toggle ---
 function toggleRecognition() {
     if (!recognition) {
-        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition)();
+        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.continuous = true;
+        recognition.interimResults = false;
+
         recognition.onresult = (event) => {
-            const result = event.results[0][0].transcript;
+            const result = event.results[event.results.length - 1][0].transcript;
             document.getElementById('output').innerText = result;
             markNumberAsChecked(result);
         };
 
         recognition.onend = () => {
             if (isListening) {
-                // If still in listening state, restart recognition
                 recognition.start();
             }
         };
     }
 
     if (!isListening) {
-        recognition.lang = isEnglish ? 'en-US' : 'de-DE'; // Set the language based on the language state
+        recognition.lang = isEnglish ? 'en-US' : 'de-DE';
         recognition.start();
         isListening = true;
     } else {
@@ -32,44 +122,34 @@ function toggleRecognition() {
         isListening = false;
     }
 
-    // Toggle the button text
     const startButton = document.getElementById('start-recognition');
     startButton.innerText = isListening ? 'Stop Recognition' : 'Start Recognition';
 }
 
-// Create a function to toggle between English and German
+// --- Language toggle ---
 function toggleLanguage() {
-    isEnglish = !isEnglish; // Toggle the language state
-
-    // Get the language-toggle button element
+    isEnglish = !isEnglish;
     const languageToggleButton = document.getElementById('language-toggle');
+    languageToggleButton.innerText = isEnglish ? 'Sprache auf Deutsch wechseln' : 'Change the language to English';
 
-    // Update the button text based on the language state
-    languageToggleButton.innerText = isEnglish ? 'Change the language to German' : 'Sprache wechseln auf Englisch';
-
-    // Set the recognition language if listening is active
     if (isListening) {
-        recognition.lang = isEnglish ? 'en-US' : 'de-DE'; // Set the language based on the language state
+        recognition.lang = isEnglish ? 'en-US' : 'de-DE';
     }
 }
 
-// Add a click event listener to the "start-recognition" button
 document.getElementById('start-recognition').addEventListener('click', () => {
-    // Acquire the wake lock when starting recording
     toggleWakeLock();
-    // Start recording logic
     toggleRecognition();
 });
 
-
-// Add a click event listener to the "language-toggle" button
 document.getElementById('language-toggle').addEventListener('click', toggleLanguage);
 
+// --- Mark number as checked ---
 function markNumberAsChecked(text) {
-    // Use a regular expression to search for numbers in the text
-    const numbers = text.match(/\d+/g);
+    const normalizedText = normalizeTranscript(text);
+    const numbers = normalizedText.match(/\d+/g);
+    let matched = false;
 
-    // Iterate through the extracted numbers and check if they match any numbers from the list
     if (numbers) {
         for (const numberStr of numbers) {
             const number = parseInt(numberStr);
@@ -77,23 +157,33 @@ function markNumberAsChecked(text) {
                 const checkbox = document.getElementById('check-' + number);
                 if (checkbox && !checkbox.checked) {
                     checkbox.checked = true;
+                    playSuccessSound();
+                    vibrate();
+                    checkbox.closest('tr').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    updateProgress();
+                    matched = true;
                 }
             }
-            
-            // Check for "55" and also tick the checkbox for "5"
+
             if (number === 55) {
                 const checkbox5 = document.getElementById('check-5');
                 if (checkbox5 && !checkbox5.checked) {
                     checkbox5.checked = true;
+                    playSuccessSound();
+                    vibrate();
+                    checkbox5.closest('tr').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    updateProgress();
+                    matched = true;
                 }
             }
         }
     }
+
+    if (!matched) playUnrecognizedSound();
 }
 
-// Add this event listener for the reset button
+// --- Reset checkboxes ---
 document.getElementById('reset-checkboxes').addEventListener('click', () => {
-    // Loop through the checkboxes and uncheck them
     for (const number of numbersList) {
         const checkbox = document.getElementById('check-' + number);
         if (checkbox && checkbox.checked) {
@@ -101,62 +191,30 @@ document.getElementById('reset-checkboxes').addEventListener('click', () => {
             checkbox.removeAttribute('data-number-text');
         }
     }
+    updateProgress();
 });
 
-// Get a reference to the modal element and body
-const workaroundModal = document.getElementById('workaround-modal');
-const body = document.body;
-
-// Function to open the modal
-function openWorkaroundModal() {
-    workaroundModal.showModal();
-
-    // Disable scrolling
-    body.classList.add('modal-open');
-}
-
-// Function to close the modal
-function closeWorkaroundModal() {
-    workaroundModal.close();
-
-    // Enable scrolling
-    body.classList.remove('modal-open');
-}
-
-// Call the openWorkaroundModal function when the page loads
-window.addEventListener('load', openWorkaroundModal);
-
-// Close the modal when the "OK" button is clicked
-document.getElementById('workaround-modal-button').addEventListener('click', closeWorkaroundModal);
-
-
-
+// --- Wake Lock ---
 let wakeLock = null;
 let isWakeLockEnabled = false;
 
 if ('wakeLock' in navigator) {
-    // Wake Lock is supported
     document.getElementById("wakeLockAPIAvailable").innerText = 'Wake Lock is supported';
 } else {
     document.getElementById("wakeLockAPIAvailable").innerText = 'Wake Lock is not supported';
-    disableButtons(true, true); // Disable buttons if wake lock is not supported
+    disableButtons(true, true);
 }
 
 async function toggleWakeLock() {
     if (isWakeLockEnabled) {
-        // Release the wake lock
         if (wakeLock) {
-            wakeLock.release().then(() => {
-                wakeLock = null; // Set wakeLock to null when released
-            });
+            wakeLock.release().then(() => { wakeLock = null; });
         }
         isWakeLockEnabled = false;
     } else {
-        // Acquire the wake lock
         if (!wakeLock) {
             wakeLock = await navigator.wakeLock.request("screen");
             console.log("Wake Lock is acquired");
-
             wakeLock.addEventListener('release', () => {
                 console.log('Wake Lock is released');
             });
@@ -165,13 +223,15 @@ async function toggleWakeLock() {
     }
 }
 
+// --- Debug toggle ---
 document.querySelector('h1').addEventListener('click', () => {
-    // Toggle the visibility of the elements
     const consoleLog = document.getElementById('console-log');
     const output = document.getElementById('output');
-    
     if (consoleLog && output) {
         consoleLog.classList.toggle('hidden');
         output.classList.toggle('hidden');
     }
 });
+
+// --- Init ---
+updateProgress();
