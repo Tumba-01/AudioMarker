@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,12 +12,14 @@
     <div id="button-container">
         <button id="start-recognition">Start Recording</button>
         <button id="stop-recognition" style="display: none;">Stop Recording</button>
+        <button id="random-check" class="hidden">Random 50%</button>
         <button id="reset-checkboxes">Reset Checkboxes</button>
     </div>
+
     <button id="language-toggle">Sprache auf Deutsch wechseln</button>
 
     <div id="progress-container">
-        <span id="progress-label">0 / 24 checked</span>
+        <span id="progress-label">0 / 0 checked</span>
         <div id="progress-bar-track">
             <div id="progress-bar-fill"></div>
         </div>
@@ -28,42 +30,51 @@
         <div id="wakeLockAPIAvailable"></div>
     </div>
 
-    <!-- Export/Import buttons -->
     <div id="export-container">
+        <label class="icon-btn" id="key-label" title="Load key">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="7" cy="7" r="3"></circle>
+                <path d="M10 10l6 6"></path>
+                <path d="M18 16l2 2"></path>
+                <path d="M20 14l-4 4"></path>
+            </svg>
+            <span id="key-label-text">Key</span>
+            <input type="file" id="key-file" accept=".txt,.json" style="display:none;">
+        </label>
+
         <button id="export-btn" class="icon-btn" title="Export">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="7 10 12 15 17 10"></polyline>
                 <line x1="12" y1="15" x2="12" y2="3"></line>
             </svg>
-            Export
+            <span id="export-btn-text">Export</span>
         </button>
+
         <label class="icon-btn" id="import-label" title="Import JSON">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="17 8 12 3 7 8"></polyline>
                 <line x1="12" y1="3" x2="12" y2="15"></line>
             </svg>
-            Import
+            <span id="import-label-text">Import</span>
             <input type="file" id="import-json" accept=".json" style="display:none;">
         </label>
     </div>
 
-    <!-- Export format selection modal -->
     <dialog id="export-format-modal">
-        <h2>Export Format</h2>
-        <p>Wählen Sie das Exportformat:</p>
+        <h2 id="export-format-title">Export Format</h2>
+        <p id="export-format-text">Choose the export format:</p>
         <div class="button-div">
             <button id="export-json-btn" type="button">JSON</button>
             <button id="export-pdf-btn" type="button">PDF</button>
-            <button id="export-format-cancel" type="button">Abbrechen</button>
+            <button id="export-format-cancel" type="button">Cancel</button>
         </div>
     </dialog>
 
-    <!-- Comment modal for incomplete exports -->
     <dialog id="comment-modal">
-        <h2>Unchecked Numbers</h2>
-        <p>Please provide a reason for each unchecked number before exporting.</p>
+        <h2 id="comment-modal-title">Unchecked Numbers</h2>
+        <p id="comment-modal-text">Please provide a reason for each unchecked number before exporting.</p>
         <div id="comment-list"></div>
         <div class="button-div">
             <button id="comment-cancel" type="button">Cancel</button>
@@ -75,36 +86,11 @@
         <table id="number-table">
             <thead>
                 <tr>
-                    <th>Number</th>
-                    <th>Check</th>
+                    <th id="table-header-number">Number</th>
+                    <th id="table-header-check">Check</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr data-number="2"><td>2</td><td><input type="checkbox" id="check-2" disabled></td></tr>
-                <tr data-number="12"><td>12</td><td><input type="checkbox" id="check-12" disabled></td></tr>
-                <tr data-number="59"><td>59</td><td><input type="checkbox" id="check-59" disabled></td></tr>
-                <tr data-number="61"><td>61</td><td><input type="checkbox" id="check-61" disabled></td></tr>
-                <tr data-number="62"><td>62</td><td><input type="checkbox" id="check-62" disabled></td></tr>
-                <tr data-number="64"><td>64</td><td><input type="checkbox" id="check-64" disabled></td></tr>
-                <tr data-number="65"><td>65</td><td><input type="checkbox" id="check-65" disabled></td></tr>
-                <tr data-number="68"><td>68</td><td><input type="checkbox" id="check-68" disabled></td></tr>
-                <tr data-number="70"><td>70</td><td><input type="checkbox" id="check-70" disabled></td></tr>
-                <tr data-number="72"><td>72</td><td><input type="checkbox" id="check-72" disabled></td></tr>
-                <tr data-number="86"><td>86</td><td><input type="checkbox" id="check-86" disabled></td></tr>
-                <tr data-number="87"><td>87</td><td><input type="checkbox" id="check-87" disabled></td></tr>
-                <tr data-number="95"><td>95</td><td><input type="checkbox" id="check-95" disabled></td></tr>
-                <tr data-number="96"><td>96</td><td><input type="checkbox" id="check-96" disabled></td></tr>
-                <tr data-number="97"><td>97</td><td><input type="checkbox" id="check-97" disabled></td></tr>
-                <tr data-number="98"><td>98</td><td><input type="checkbox" id="check-98" disabled></td></tr>
-                <tr data-number="99"><td>99</td><td><input type="checkbox" id="check-99" disabled></td></tr>
-                <tr data-number="105"><td>105</td><td><input type="checkbox" id="check-105" disabled></td></tr>
-                <tr data-number="106"><td>106</td><td><input type="checkbox" id="check-106" disabled></td></tr>
-                <tr data-number="109"><td>109</td><td><input type="checkbox" id="check-109" disabled></td></tr>
-                <tr data-number="110"><td>110</td><td><input type="checkbox" id="check-110" disabled></td></tr>
-                <tr data-number="173"><td>173</td><td><input type="checkbox" id="check-173" disabled></td></tr>
-                <tr data-number="186"><td>186</td><td><input type="checkbox" id="check-186" disabled></td></tr>
-                <tr data-number="187"><td>187</td><td><input type="checkbox" id="check-187" disabled></td></tr>
-            </tbody>
+            <tbody id="number-table-body"></tbody>
         </table>
     </div>
 
