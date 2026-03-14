@@ -2,7 +2,14 @@
 body, h1, button, table {
     margin: 0;
     padding: 0;
-    zoom: 1.4;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
 }
 
 body {
@@ -13,12 +20,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 100vh;
+    padding: 16px;
 }
 
 h1 {
-    font-size: 24px;
+    font-size: clamp(1.4rem, 2vw, 1.8rem);
     margin-top: 10px;
     margin-bottom: 20px;
     letter-spacing: 2px;
@@ -27,6 +35,7 @@ h1 {
     text-shadow: 0 0 20px rgba(53, 212, 159, 0.4);
 }
 
+/* Buttons */
 button {
     background: rgba(11, 50, 37, 0.4);
     color: #fff;
@@ -49,11 +58,59 @@ button:hover {
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
+.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.icon-btn svg {
+    flex-shrink: 0;
+}
+
 #button-container {
     display: flex;
     gap: 10px;
     align-items: center;
     padding-bottom: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Export/Import buttons */
+#export-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 8px 0;
+}
+
+#import-label {
+    background: rgba(11, 50, 37, 0.4);
+    color: #fff;
+    padding: 10px 20px;
+    border: 1px solid rgba(53, 212, 159, 0.25);
+    cursor: pointer;
+    border-radius: 100px;
+    font-size: 16px;
+    margin: 5px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transition: background 0.3s, box-shadow 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#import-label:hover {
+    background: rgba(53, 212, 159, 0.3);
+    box-shadow: 0 4px 20px rgba(53, 212, 159, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* Progress bar */
@@ -63,8 +120,7 @@ button:hover {
     align-items: center;
     gap: 6px;
     margin: 10px 0;
-    width: 100%;
-    max-width: 400px;
+    width: min(100%, 400px);
 }
 
 #progress-label {
@@ -93,15 +149,17 @@ button:hover {
 }
 
 /* Table */
+#table-wrapper {
+    width: min(100%, 420px);
+}
+
 table {
     border-collapse: collapse;
     width: 100%;
     max-width: 400px;
-    margin: 0 auto;
+    margin: 20px auto;
     border-radius: 16px;
     overflow: hidden;
-    margin-top: 20px;
-    margin-bottom: 20px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
                 inset 0 1px 0 rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(53, 212, 159, 0.15);
@@ -122,7 +180,7 @@ th {
 }
 
 td {
-    padding: 2px;
+    padding: 6px;
 }
 
 tr:nth-child(odd) {
@@ -153,6 +211,7 @@ input[type="checkbox"] {
     transition: background 0.2s, box-shadow 0.2s;
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+    position: relative;
 }
 
 input[type="checkbox"]:checked {
@@ -183,9 +242,9 @@ input[type="checkbox"]::before {
     font-size: 14px;
     padding: 10px;
     border-radius: 15px;
-    height: 20px;
-    width: 325px;
-    overflow-y: scroll;
+    min-height: 20px;
+    width: min(100%, 325px);
+    overflow-y: auto;
     text-align: center;
     border: 1px solid rgba(53, 212, 159, 0.2);
     backdrop-filter: blur(10px);
@@ -210,6 +269,168 @@ input[type="checkbox"]::before {
 #output::-webkit-scrollbar-thumb { background-color: #0f0; border-radius: 5px; }
 #output::-webkit-scrollbar-track { background-color: rgba(0, 255, 0, 0); }
 
+/* Modal */
+#comment-modal,
+#export-format-modal {
+    width: min(92vw, 560px);
+    max-width: 560px;
+    max-height: min(85vh, 700px);
+    padding: 18px;
+    border: 1px solid rgba(53, 212, 159, 0.3);
+    border-radius: 16px;
+    background: rgba(13, 46, 31, 0.97);
+    color: #fff;
+    overflow: hidden;
+    margin: auto;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.7),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+#export-format-modal {
+    max-height: 300px;
+}
+
+#comment-modal h2,
+#export-format-modal h2 {
+    margin: 0 0 6px 0;
+    color: #a8f0d0;
+    font-size: 17px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+#comment-modal p,
+#export-format-modal p {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 14px;
+    line-height: 1.5;
+}
+
+#comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: calc(85vh - 170px);
+    overflow-y: auto;
+    padding-right: 4px;
+    margin-bottom: 4px;
+}
+
+#comment-list::-webkit-scrollbar { width: 5px; }
+#comment-list::-webkit-scrollbar-thumb {
+    background: rgba(53, 212, 159, 0.4);
+    border-radius: 10px;
+}
+#comment-list::-webkit-scrollbar-track { background: transparent; }
+
+.comment-row {
+    display: grid;
+    grid-template-columns: 80px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+}
+
+.comment-row label {
+    font-size: 13px;
+    color: #a8f0d0;
+    font-weight: bold;
+    text-align: left;
+}
+
+.comment-row input {
+    width: 100%;
+    min-width: 0;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(53, 212, 159, 0.25);
+    border-radius: 8px;
+    color: #fff;
+    padding: 8px 10px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.comment-row input:focus {
+    border-color: #35D49F;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.comment-row input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.button-div {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    border-top: 1px solid rgba(53, 212, 159, 0.15);
+    padding-top: 12px;
+    position: sticky;
+    bottom: 0;
+    background: rgba(13, 46, 31, 0.97);
+}
+
+#comment-modal::backdrop,
+#export-format-modal::backdrop {
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
 .hidden {
     display: none;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 12px;
+    }
+
+    button,
+    #import-label {
+        width: 100%;
+        max-width: 320px;
+        margin: 4px 0;
+    }
+
+    #button-container,
+    #export-container {
+        width: 100%;
+        gap: 8px;
+    }
+
+    #comment-modal,
+    #export-format-modal {
+        width: min(96vw, 560px);
+        padding: 14px;
+        max-height: 88vh;
+    }
+
+    #comment-list {
+        max-height: calc(88vh - 180px);
+    }
+
+    .comment-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .comment-row label {
+        text-align: left;
+    }
+
+    .button-div {
+        justify-content: stretch;
+    }
+
+    .button-div button {
+        width: 100%;
+        max-width: none;
+    }
 }

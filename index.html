@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AudioMarker</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
@@ -25,6 +27,49 @@
     <div id="output" class="hidden">
         <div id="wakeLockAPIAvailable"></div>
     </div>
+
+    <!-- Export/Import buttons -->
+    <div id="export-container">
+        <button id="export-btn" class="icon-btn" title="Export">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Export
+        </button>
+        <label class="icon-btn" id="import-label" title="Import JSON">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            Import
+            <input type="file" id="import-json" accept=".json" style="display:none;">
+        </label>
+    </div>
+
+    <!-- Export format selection modal -->
+    <dialog id="export-format-modal">
+        <h2>Export Format</h2>
+        <p>Wählen Sie das Exportformat:</p>
+        <div class="button-div">
+            <button id="export-json-btn" type="button">JSON</button>
+            <button id="export-pdf-btn" type="button">PDF</button>
+            <button id="export-format-cancel" type="button">Abbrechen</button>
+        </div>
+    </dialog>
+
+    <!-- Comment modal for incomplete exports -->
+    <dialog id="comment-modal">
+        <h2>Unchecked Numbers</h2>
+        <p>Please provide a reason for each unchecked number before exporting.</p>
+        <div id="comment-list"></div>
+        <div class="button-div">
+            <button id="comment-cancel" type="button">Cancel</button>
+            <button id="comment-confirm" type="button">Confirm</button>
+        </div>
+    </dialog>
 
     <div id="table-wrapper">
         <table id="number-table">
@@ -63,6 +108,7 @@
         </table>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
