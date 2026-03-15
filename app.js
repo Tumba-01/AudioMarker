@@ -5,6 +5,9 @@ window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecogn
 let isListening = false;
 let currentLanguage = 'en';
 let pendingExportType = null;
+let wakeLock = null;
+let isWakeLockEnabled = false;
+let shouldRestartRecognition = false;
 
 const translations = {
     en: {
@@ -16,7 +19,6 @@ const translations = {
         stopRecording: 'Stop Recording',
         random50: 'Random 50%',
         resetCheckboxes: 'Reset Checkboxes',
-        switchLanguage: 'Sprache auf Deutsch wechseln',
 
         progressChecked: 'checked',
         consoleLog: 'Console Log',
@@ -50,6 +52,7 @@ const translations = {
         allNumbersChecked: 'All numbers are already checked.',
         importedSession: date => `Imported session from ${date || 'unknown date'}`,
         invalidJson: 'Invalid JSON file.',
+        speechNotSupported: 'Speech recognition is not supported in this browser.',
 
         defaultUncheckedReason: 'Not triggered',
         noReasonGiven: 'No reason provided',
@@ -79,7 +82,6 @@ const translations = {
         stopRecording: 'Aufnahme stoppen',
         random50: 'Zufällige 50%',
         resetCheckboxes: 'Checkboxen zurücksetzen',
-        switchLanguage: 'Change the language to English',
 
         progressChecked: 'geprüft',
         consoleLog: 'Konsolenprotokoll',
@@ -113,6 +115,7 @@ const translations = {
         allNumbersChecked: 'Alle Nummern sind bereits markiert.',
         importedSession: date => `Importierte Sitzung vom ${date || 'unbekanntes Datum'}`,
         invalidJson: 'Ungültige JSON-Datei.',
+        speechNotSupported: 'Spracherkennung wird in diesem Browser nicht unterstützt.',
 
         defaultUncheckedReason: 'Nicht ausgelöst',
         noReasonGiven: 'Kein Grund angegeben',
@@ -135,7 +138,6 @@ const translations = {
     }
 };
 
-// --- Word-to-number mapping ---
 const wordToNumber = {
     'one': 1, 'won': 1,
     'two': 2, 'to': 2, 'too': 2,
@@ -174,14 +176,30 @@ const wordToNumber = {
     'neunzig': 90, 'hundert': 100
 };
 
+const langSwitch = document.getElementById('langSwitch');
+const labelEN = document.getElementById('lang-label-en');
+const labelDE = document.getElementById('lang-label-de');
+
 function t() {
     return translations[currentLanguage];
 }
 
 function normalizeTranscript(text) {
-    return text.toLowerCase().split(/\s+/).map(word => {
-        return wordToNumber[word] !== undefined ? wordToNumber[word] : word;
-    }).join(' ');
+    return text
+        .toLowerCase()
+        .split(/\s+/)
+        .map(word => wordToNumber[word] !== undefined ? wordToNumber[word] : word)
+        .join(' ');
+}
+
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.innerText = value;
+}
+
+function setTitle(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.title = value;
 }
 
 function syncModalScrollLock() {
@@ -194,43 +212,53 @@ document.querySelectorAll('dialog').forEach(dialog => {
     dialog.addEventListener('cancel', syncModalScrollLock);
 });
 
+function syncLanguagePill() {
+    if (!langSwitch || !labelEN || !labelDE) return;
+
+    const isGerman = currentLanguage === 'de';
+    langSwitch.classList.toggle('de', isGerman);
+    langSwitch.setAttribute('aria-checked', String(isGerman));
+    labelEN.classList.toggle('active', !isGerman);
+    labelDE.classList.toggle('active', isGerman);
+}
+
 function applyLanguage() {
     const lang = t();
 
     document.documentElement.lang = lang.htmlLang;
     document.title = 'AudioMarker';
 
-    document.getElementById('start-recognition').innerText = isListening ? lang.stopRecording : lang.startRecording;
-    document.getElementById('stop-recognition').innerText = lang.stopRecording;
-    document.getElementById('random-check').innerText = lang.random50;
-    document.getElementById('reset-checkboxes').innerText = lang.resetCheckboxes;
-    document.getElementById('language-toggle').innerText = lang.switchLanguage;
+    setText('start-recognition', isListening ? lang.stopRecording : lang.startRecording);
+    setText('random-check', lang.random50);
+    setText('reset-checkboxes', lang.resetCheckboxes);
 
-    document.getElementById('console-log').innerText = lang.consoleLog;
+    setText('console-log', lang.consoleLog);
 
-    document.getElementById('key-label-text').innerText = lang.key;
-    document.getElementById('key-label').title = lang.keyTitle;
-    document.getElementById('export-btn-text').innerText = lang.export;
-    document.getElementById('export-btn').title = lang.exportTitle;
-    document.getElementById('import-label-text').innerText = lang.import;
-    document.getElementById('import-label').title = lang.importTitle;
+    setText('key-label-text', lang.key);
+    setTitle('key-label', lang.keyTitle);
+    setText('export-btn-text', lang.export);
+    setTitle('export-btn', lang.exportTitle);
+    setText('import-label-text', lang.import);
+    setTitle('import-label', lang.importTitle);
 
-    document.getElementById('export-format-title').innerText = lang.exportFormatTitle;
-    document.getElementById('export-format-text').innerText = lang.exportFormatText;
-    document.getElementById('export-format-cancel').innerText = lang.cancel;
+    setText('export-format-title', lang.exportFormatTitle);
+    setText('export-format-text', lang.exportFormatText);
+    setText('export-json-btn', 'JSON');
+    setText('export-pdf-btn', 'PDF');
+    setText('export-format-cancel', lang.cancel);
 
-    document.getElementById('comment-modal-title').innerText = lang.commentModalTitle;
-    document.getElementById('comment-modal-text').innerText = lang.commentModalText;
-    document.getElementById('comment-cancel').innerText = lang.cancel;
-    document.getElementById('comment-confirm').innerText = lang.confirm;
+    setText('comment-modal-title', lang.commentModalTitle);
+    setText('comment-modal-text', lang.commentModalText);
+    setText('comment-cancel', lang.cancel);
+    setText('comment-confirm', lang.confirm);
 
-    document.getElementById('table-header-number').innerText = lang.tableNumber;
-    document.getElementById('table-header-check').innerText = lang.tableCheck;
+    setText('table-header-number', lang.tableNumber);
+    setText('table-header-check', lang.tableCheck);
 
-    document.getElementById('wakeLockAPIAvailable').innerText =
-        'wakeLock' in navigator ? lang.wakeLockSupported : lang.wakeLockNotSupported;
-
-    updateProgress();
+    setText(
+        'wakeLockAPIAvailable',
+        'wakeLock' in navigator ? lang.wakeLockSupported : lang.wakeLockNotSupported
+    );
 
     const commentInputs = document.querySelectorAll('#comment-list input');
     commentInputs.forEach(input => {
@@ -241,6 +269,9 @@ function applyLanguage() {
     commentLabels.forEach(label => {
         label.innerText = `${lang.commentLabelPrefix} ${label.dataset.number}`;
     });
+
+    syncLanguagePill();
+    updateProgress();
 }
 
 function updateProgress() {
@@ -250,12 +281,20 @@ function updateProgress() {
         return cb && cb.checked;
     }).length;
 
-    document.getElementById('progress-label').innerText = `${checked} / ${total} ${t().progressChecked}`;
-    document.getElementById('progress-bar-fill').style.width = `${total ? (checked / total) * 100 : 0}%`;
-    document.getElementById('progress-bar-fill').style.background =
-        checked === total && total > 0
-            ? 'linear-gradient(90deg, #f5c400, #ffe066)'
-            : 'linear-gradient(90deg, #35D49F, #05EB20)';
+    const progressLabel = document.getElementById('progress-label');
+    const progressBarFill = document.getElementById('progress-bar-fill');
+
+    if (progressLabel) {
+        progressLabel.innerText = `${checked} / ${total} ${t().progressChecked}`;
+    }
+
+    if (progressBarFill) {
+        progressBarFill.style.width = `${total ? (checked / total) * 100 : 0}%`;
+        progressBarFill.style.background =
+            checked === total && total > 0
+                ? 'linear-gradient(90deg, #f5c400, #ffe066)'
+                : 'linear-gradient(90deg, #35D49F, #05EB20)';
+    }
 }
 
 function vibrate() {
@@ -266,13 +305,16 @@ function playSuccessSound() {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
+
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
+
     oscillator.type = 'sine';
     oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
     oscillator.frequency.setValueAtTime(1100, audioCtx.currentTime + 0.1);
     gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+
     oscillator.start(audioCtx.currentTime);
     oscillator.stop(audioCtx.currentTime + 0.4);
 }
@@ -281,19 +323,24 @@ function playUnrecognizedSound() {
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const oscillator = audioCtx.createOscillator();
     const gainNode = audioCtx.createGain();
+
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
+
     oscillator.type = 'sawtooth';
     oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
     oscillator.frequency.setValueAtTime(200, audioCtx.currentTime + 0.15);
     gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+
     oscillator.start(audioCtx.currentTime);
     oscillator.stop(audioCtx.currentTime + 0.4);
 }
 
 function renderTable() {
     const tbody = document.getElementById('number-table-body');
+    if (!tbody) return;
+
     tbody.innerHTML = '';
 
     numbersList.forEach(number => {
@@ -331,12 +378,12 @@ function parseKeyText(text) {
     return [...new Set(parsed)].sort((a, b) => a - b);
 }
 
-document.getElementById('key-file').addEventListener('change', (event) => {
+document.getElementById('key-file')?.addEventListener('change', event => {
     const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
         try {
             const text = String(e.target.result || '');
             const parsedNumbers = parseKeyText(text);
@@ -358,38 +405,66 @@ document.getElementById('key-file').addEventListener('change', (event) => {
     event.target.value = '';
 });
 
-function toggleRecognition() {
-    if (!recognition) {
-        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.continuous = true;
-        recognition.interimResults = false;
+function ensureRecognition() {
+    if (recognition) return recognition;
+    if (!(window.SpeechRecognition || window.webkitSpeechRecognition)) return null;
 
-        recognition.onresult = (event) => {
-            const result = event.results[event.results.length - 1][0].transcript;
-            document.getElementById('output').innerText = result;
-            markNumberAsChecked(result);
-        };
+    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = t().speechLang;
 
-        recognition.onend = () => {
-            if (isListening) recognition.start();
-        };
-    }
+    recognition.onresult = event => {
+        const result = event.results[event.results.length - 1][0].transcript;
+        const output = document.getElementById('output');
+        if (output) output.innerText = result;
+        markNumberAsChecked(result);
+    };
 
+    recognition.onend = () => {
+        if (shouldRestartRecognition && isListening) {
+            setTimeout(() => {
+                try {
+                    recognition.lang = t().speechLang;
+                    recognition.start();
+                } catch {}
+            }, 150);
+        }
+    };
+
+    recognition.onerror = () => {};
+
+    return recognition;
+}
+
+async function toggleRecognition() {
     if (!numbersList.length) {
         alert(t().loadKeyFirst);
         return;
     }
 
-    if (!isListening) {
-        recognition.lang = t().speechLang;
-        recognition.start();
-        isListening = true;
-    } else {
-        recognition.stop();
-        isListening = false;
+    const instance = ensureRecognition();
+    if (!instance) {
+        alert(t().speechNotSupported);
+        return;
     }
 
-    document.getElementById('start-recognition').innerText = isListening ? t().stopRecording : t().startRecording;
+    if (!isListening) {
+        try {
+            instance.lang = t().speechLang;
+            shouldRestartRecognition = true;
+            instance.start();
+            isListening = true;
+        } catch {}
+    } else {
+        shouldRestartRecognition = false;
+        isListening = false;
+        try {
+            instance.stop();
+        } catch {}
+    }
+
+    applyLanguage();
 }
 
 function toggleLanguage() {
@@ -401,17 +476,22 @@ function toggleLanguage() {
     }
 
     if (isListening && recognition) {
-        recognition.stop();
-        recognition.lang = t().speechLang;
+        shouldRestartRecognition = false;
+        try {
+            recognition.stop();
+        } catch {}
+
+        setTimeout(() => {
+            if (isListening && recognition) {
+                try {
+                    recognition.lang = t().speechLang;
+                    shouldRestartRecognition = true;
+                    recognition.start();
+                } catch {}
+            }
+        }, 200);
     }
 }
-
-document.getElementById('start-recognition').addEventListener('click', () => {
-    toggleWakeLock();
-    toggleRecognition();
-});
-
-document.getElementById('language-toggle').addEventListener('click', toggleLanguage);
 
 function markNumberAsChecked(text) {
     const normalizedText = normalizeTranscript(text);
@@ -439,7 +519,14 @@ function markNumberAsChecked(text) {
     if (!matched) playUnrecognizedSound();
 }
 
-document.getElementById('reset-checkboxes').addEventListener('click', () => {
+document.getElementById('start-recognition')?.addEventListener('click', async () => {
+    await toggleWakeLock();
+    await toggleRecognition();
+});
+
+document.getElementById('langSwitch')?.addEventListener('click', toggleLanguage);
+
+document.getElementById('reset-checkboxes')?.addEventListener('click', () => {
     for (const number of numbersList) {
         const checkbox = document.getElementById('check-' + number);
         if (checkbox && checkbox.checked) {
@@ -484,17 +571,19 @@ function doExportJSON(comments = {}) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     const dateStr = new Date().toISOString().slice(0, 10);
+
     a.href = url;
     a.download = `${t().exportFileName(dateStr)}.json`;
     a.click();
+
     URL.revokeObjectURL(url);
 }
 
 function doExportPDF(comments = {}) {
     const data = buildSessionData(comments);
     const lang = translations[data.language] || t();
-
     const { jsPDF } = window.jspdf;
+
     const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -574,21 +663,22 @@ function doExportPDF(comments = {}) {
     doc.save(`${lang.exportFileName(dateStr)}.pdf`);
 }
 
-document.getElementById('export-btn').addEventListener('click', () => {
+document.getElementById('export-btn')?.addEventListener('click', () => {
     if (!numbersList.length) {
         alert(t().loadKeyFirst);
         return;
     }
-    document.getElementById('export-format-modal').showModal();
+    document.getElementById('export-format-modal')?.showModal();
     syncModalScrollLock();
 });
 
-document.getElementById('export-format-cancel').addEventListener('click', () => {
-    document.getElementById('export-format-modal').close();
+document.getElementById('export-format-cancel')?.addEventListener('click', () => {
+    document.getElementById('export-format-modal')?.close();
 });
 
-document.getElementById('export-json-btn').addEventListener('click', () => {
-    document.getElementById('export-format-modal').close();
+document.getElementById('export-json-btn')?.addEventListener('click', () => {
+    document.getElementById('export-format-modal')?.close();
+
     const allChecked = numbersList.every(n => {
         const cb = document.getElementById('check-' + n);
         return cb && cb.checked;
@@ -602,8 +692,9 @@ document.getElementById('export-json-btn').addEventListener('click', () => {
     }
 });
 
-document.getElementById('export-pdf-btn').addEventListener('click', () => {
-    document.getElementById('export-format-modal').close();
+document.getElementById('export-pdf-btn')?.addEventListener('click', () => {
+    document.getElementById('export-format-modal')?.close();
+
     const allChecked = numbersList.every(n => {
         const cb = document.getElementById('check-' + n);
         return cb && cb.checked;
@@ -624,6 +715,8 @@ function openCommentModal() {
     });
 
     const commentList = document.getElementById('comment-list');
+    if (!commentList) return;
+
     commentList.innerHTML = unchecked.map(n => `
         <div class="comment-row">
             <label for="comment-${n}" data-number="${n}">${t().commentLabelPrefix} ${n}</label>
@@ -631,7 +724,7 @@ function openCommentModal() {
         </div>
     `).join('');
 
-    document.getElementById('comment-modal').showModal();
+    document.getElementById('comment-modal')?.showModal();
     syncModalScrollLock();
 }
 
@@ -646,12 +739,13 @@ function getComments() {
         const input = document.getElementById('comment-' + n);
         if (input) comments[n] = input.value.trim() || t().noReasonGiven;
     }
+
     return comments;
 }
 
-document.getElementById('comment-confirm').addEventListener('click', () => {
+document.getElementById('comment-confirm')?.addEventListener('click', () => {
     const comments = getComments();
-    document.getElementById('comment-modal').close();
+    document.getElementById('comment-modal')?.close();
 
     if (pendingExportType === 'json') {
         doExportJSON(comments);
@@ -662,27 +756,31 @@ document.getElementById('comment-confirm').addEventListener('click', () => {
     pendingExportType = null;
 });
 
-document.getElementById('comment-cancel').addEventListener('click', () => {
-    document.getElementById('comment-modal').close();
+document.getElementById('comment-cancel')?.addEventListener('click', () => {
+    document.getElementById('comment-modal')?.close();
     pendingExportType = null;
 });
 
-document.getElementById('import-json').addEventListener('change', (event) => {
+document.getElementById('import-json')?.addEventListener('change', event => {
     const file = event.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
         try {
             const data = JSON.parse(e.target.result);
 
             if (data.language && translations[data.language]) {
                 currentLanguage = data.language;
-                applyLanguage();
             }
 
             if (Array.isArray(data.numbers)) {
-                numbersList = [...new Set(data.numbers.map(n => parseInt(n, 10)).filter(n => !isNaN(n)))].sort((a, b) => a - b);
+                numbersList = [...new Set(
+                    data.numbers
+                        .map(n => parseInt(n, 10))
+                        .filter(n => !isNaN(n))
+                )].sort((a, b) => a - b);
+
                 renderTable();
             }
 
@@ -704,6 +802,7 @@ document.getElementById('import-json').addEventListener('change', (event) => {
                 }
             }
 
+            applyLanguage();
             updateProgress();
             alert(t().importedSession(data.exportedAtReadable));
         } catch {
@@ -715,31 +814,31 @@ document.getElementById('import-json').addEventListener('change', (event) => {
     event.target.value = '';
 });
 
-let wakeLock = null;
-let isWakeLockEnabled = false;
-
 async function toggleWakeLock() {
-    if (isWakeLockEnabled) {
-        if (wakeLock) {
-            wakeLock.release().then(() => {
+    try {
+        if (isWakeLockEnabled) {
+            if (wakeLock) {
+                await wakeLock.release();
                 wakeLock = null;
-            });
+            }
+            isWakeLockEnabled = false;
+        } else {
+            if (!wakeLock && 'wakeLock' in navigator) {
+                wakeLock = await navigator.wakeLock.request('screen');
+                wakeLock.addEventListener('release', () => {
+                    wakeLock = null;
+                    isWakeLockEnabled = false;
+                    applyLanguage();
+                });
+                isWakeLockEnabled = true;
+            }
         }
-        isWakeLockEnabled = false;
-    } else {
-        if (!wakeLock && 'wakeLock' in navigator) {
-            wakeLock = await navigator.wakeLock.request('screen');
-            console.log('Wake Lock is acquired');
-            wakeLock.addEventListener('release', () => {
-                console.log('Wake Lock is released');
-            });
-        }
-        isWakeLockEnabled = true;
-    }
+    } catch {}
+
     applyLanguage();
 }
 
-document.querySelector('h1').addEventListener('click', () => {
+document.querySelector('h1')?.addEventListener('click', () => {
     const consoleLog = document.getElementById('console-log');
     const output = document.getElementById('output');
     const randomCheck = document.getElementById('random-check');
@@ -753,7 +852,6 @@ document.querySelector('h1').addEventListener('click', () => {
         randomCheck.classList.toggle('hidden');
     }
 });
-
 
 function shuffleArray(array) {
     const arr = [...array];
@@ -794,7 +892,7 @@ function randomCheckHalf() {
     updateProgress();
 }
 
-document.getElementById('random-check').addEventListener('click', randomCheckHalf);
+document.getElementById('random-check')?.addEventListener('click', randomCheckHalf);
 
 applyLanguage();
 updateProgress();

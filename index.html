@@ -7,91 +7,118 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
-    <h1>AudioMarker</h1>
+    <div class="app-shell">
+        <h1>AudioMarker </h1>
+        <section class="control-panel primary-panel">
+            <div id="button-container" class="action-group">
+                <button id="start-recognition" type="button">Start Recording</button>
+                <button id="reset-checkboxes" type="button">Reset Checkboxes</button>
+                <button id="random-check" type="button" class="hidden">Random 50%</button>
 
-    <div id="button-container">
-        <button id="start-recognition">Start Recording</button>
-        <button id="stop-recognition" style="display: none;">Stop Recording</button>
-        <button id="random-check" class="hidden">Random 50%</button>
-        <button id="reset-checkboxes">Reset Checkboxes</button>
-    </div>
+                <div class="lang-toggle-wrap" aria-label="Language switcher">
+                    <span class="lang-pill-label label en active" id="lang-label-en">EN</span>
 
-    <button id="language-toggle">Sprache auf Deutsch wechseln</button>
+                    <button
+                        id="langSwitch"
+                        class="lang-switch"
+                        type="button"
+                        role="switch"
+                        aria-checked="false"
+                        aria-label="Switch language"
+                        title="Switch language"
+                    >
+                        <span class="knob"></span>
+                    </button>
 
-    <div id="progress-container">
-        <span id="progress-label">0 / 0 checked</span>
-        <div id="progress-bar-track">
-            <div id="progress-bar-fill"></div>
+                    <span class="lang-pill-label label de" id="lang-label-de">DE</span>
+                </div>
+                
+            </div>
+        </section>
+        <div class="section-divider" aria-hidden="true">
+            <span></span>
         </div>
-    </div>
 
-    <div id="console-log" class="hidden">Console Log</div>
-    <div id="output" class="hidden">
-        <div id="wakeLockAPIAvailable"></div>
-    </div>
+        <section class="control-panel secondary-panel">
+            <div id="export-container" class="action-group tool-group">
+                <label class="icon-btn" id="key-label" for="key-file" title="Load key">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="7" cy="7" r="3"></circle>
+                        <path d="M10 10l6 6"></path>
+                        <path d="M18 16l2 2"></path>
+                        <path d="M20 14l-4 4"></path>
+                    </svg>
+                    <span id="key-label-text">Key</span>
+                </label>
+                <input type="file" id="key-file" accept=".txt,.json" style="display:none;">
 
-    <div id="export-container">
-        <label class="icon-btn" id="key-label" title="Load key">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="7" cy="7" r="3"></circle>
-                <path d="M10 10l6 6"></path>
-                <path d="M18 16l2 2"></path>
-                <path d="M20 14l-4 4"></path>
-            </svg>
-            <span id="key-label-text">Key</span>
-            <input type="file" id="key-file" accept=".txt,.json" style="display:none;">
-        </label>
+                <button id="export-btn" class="icon-btn" type="button" title="Export">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span id="export-btn-text">Export</span>
+                </button>
 
-        <button id="export-btn" class="icon-btn" title="Export">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
-            <span id="export-btn-text">Export</span>
-        </button>
+                <label class="icon-btn" id="import-label" for="import-json" title="Import JSON">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <span id="import-label-text">Import</span>
+                </label>
+                <input type="file" id="import-json" accept=".json" style="display:none;">
+            </div>
+        </section>
 
-        <label class="icon-btn" id="import-label" title="Import JSON">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-            </svg>
-            <span id="import-label-text">Import</span>
-            <input type="file" id="import-json" accept=".json" style="display:none;">
-        </label>
-    </div>
+        <section class="content-panel">
+            <div id="progress-container">
+                <span id="progress-label">0 / 0 checked</span>
+                <div id="progress-bar-track">
+                    <div id="progress-bar-fill"></div>
+                </div>
+            </div>
 
-    <dialog id="export-format-modal">
-        <h2 id="export-format-title">Export Format</h2>
-        <p id="export-format-text">Choose the export format:</p>
-        <div class="button-div">
-            <button id="export-json-btn" type="button">JSON</button>
-            <button id="export-pdf-btn" type="button">PDF</button>
-            <button id="export-format-cancel" type="button">Cancel</button>
-        </div>
-    </dialog>
+            <div id="console-log" class="hidden">Console Log</div>
 
-    <dialog id="comment-modal">
-        <h2 id="comment-modal-title">Unchecked Numbers</h2>
-        <p id="comment-modal-text">Please provide a reason for each unchecked number before exporting.</p>
-        <div id="comment-list"></div>
-        <div class="button-div">
-            <button id="comment-cancel" type="button">Cancel</button>
-            <button id="comment-confirm" type="button">Confirm</button>
-        </div>
-    </dialog>
+            <div id="output" class="hidden">
+                <div id="wakeLockAPIAvailable"></div>
+            </div>
 
-    <div id="table-wrapper">
-        <table id="number-table">
-            <thead>
-                <tr>
-                    <th id="table-header-number">Number</th>
-                    <th id="table-header-check">Check</th>
-                </tr>
-            </thead>
-            <tbody id="number-table-body"></tbody>
-        </table>
+            <div id="table-wrapper">
+                <table id="number-table">
+                    <thead>
+                        <tr>
+                            <th id="table-header-number">Number</th>
+                            <th id="table-header-check">Check</th>
+                        </tr>
+                    </thead>
+                    <tbody id="number-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <dialog id="export-format-modal">
+            <h2 id="export-format-title">Export Format</h2>
+            <p id="export-format-text">Choose the export format:</p>
+            <div class="button-div">
+                <button id="export-json-btn" type="button">JSON</button>
+                <button id="export-pdf-btn" type="button">PDF</button>
+                <button id="export-format-cancel" type="button">Cancel</button>
+            </div>
+        </dialog>
+
+        <dialog id="comment-modal">
+            <h2 id="comment-modal-title">Unchecked Numbers</h2>
+            <p id="comment-modal-text">Please provide a reason for each unchecked number before exporting.</p>
+            <div id="comment-list"></div>
+            <div class="button-div">
+                <button id="comment-cancel" type="button">Cancel</button>
+                <button id="comment-confirm" type="button">Confirm</button>
+            </div>
+        </dialog>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
